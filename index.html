@@ -330,17 +330,17 @@
 
       // 列幅設定
       ws.columns = [
-        { width: 40 }, // A: 商品名
-        { width: 18 }, // B: 項目・選択肢
+        { width: 45 }, // A: 商品名
+        { width: 24 }, // B: 項目・選択肢
         { width: 6  }, // C: 個数
-        { width: 14 }, // D: 氏名
-        { width: 10 }, // E: 郵便番号
-        { width: 7  }, // F: 都道府県
-        { width: 14 }, // G: 都市区
-        { width: 30 }, // H: 町以降
-        { width: 14 }, // I: 電話番号
-        { width: 14 }, // J: お届け日指定
-        { width: 16 }, // K: お届け時間帯
+        { width: 16 }, // D: 氏名
+        { width: 12 }, // E: 郵便番号
+        { width: 10 }, // F: 都道府県
+        { width: 18 }, // G: 都市区
+        { width: 36 }, // H: 町以降
+        { width: 16 }, // I: 電話番号
+        { width: 16 }, // J: お届け日指定
+        { width: 18 }, // K: お届け時間帯
       ];
 
       const COLS = 11;
@@ -349,41 +349,41 @@
       const bdr = (s, argb = 'FF000000') => ({ style: s, color: { argb } });
       const btm = (s) => ({ bottom: bdr(s, 'FF000000') });
 
-      // Row 1: タイトル（下線のみ）
-      const r1 = ws.addRow(['APJ 発注書']);
-      r1.height = 30;
-      r1.getCell(1).font = font({ bold: true, size: 16 });
+      // Row 1: 見出し「アートプリントジャパン 御中」（下線のみ）
+      const r1 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '', '', `発注日：${dateStr}`]);
+      r1.height = 28;
+      r1.getCell(1).font = font({ bold: true, size: 14 });
       r1.getCell(1).border = { bottom: bdr('medium') };
+      r1.getCell(11).font = font({ size: 10 });
+      r1.getCell(11).alignment = { horizontal: 'right', vertical: 'bottom' };
 
       // Row 2: 空行
-      ws.addRow([]).height = 10;
+      ws.addRow([]).height = 8;
 
-      // Row 3: 宛先（左）＋ 発注日（右、普通テキスト）
-      const r3 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '', '', `発注日：${dateStr}`]);
-      r3.height = 20;
-      r3.getCell(1).font = font({ bold: true, size: 12 });
-      r3.getCell(11).font = font({ size: 10 });
-      r3.getCell(11).alignment = { horizontal: 'right' };
+      // Row 3: 発注者
+      const r3 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田']);
+      r3.height = 17;
+      r3.getCell(1).font = font({ bold: true });
 
-      // Row 4: 発注者
-      const r4 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田']);
+      // Row 4: 住所・TEL
+      const r4 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地　TEL：052-807-0299　FAX：052-685-5116']);
       r4.height = 17;
-      r4.getCell(1).font = font({ bold: true });
+      r4.getCell(1).font = font({ color: { argb: 'FF444444' } });
 
-      // Row 5: 住所・TEL
-      const r5 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地　TEL：052-807-0299　FAX：052-685-5116']);
+      // Row 5: 挨拶文
+      const r5 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
       r5.height = 17;
-      r5.getCell(1).font = font({ color: { argb: 'FF444444' } });
+      r5.getCell(1).font = font();
 
-      // Row 6: 挨拶文
-      const r6 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
+      // Row 6: 送り状連絡依頼（挨拶文と同じくくり）
+      const r6 = ws.addRow(['発送後は送り状番号をメールにてご連絡いただけますと幸いです。']);
       r6.height = 17;
       r6.getCell(1).font = font();
 
-      // Row 7: 注意事項（赤字、背景なし）
-      const r7 = ws.addRow(['【注意】●配送料は記載しないで下さい　●発送後に送り状番号をメールでご連絡下さい　●お届け日指定が空白の注文は日時指定しないで下さい']);
+      // Row 7: お願い事項
+      const r7 = ws.addRow(['＊配送料は記載しないでください　＊お届け日指定が空欄の注文は 日時の指定は不要です']);
       r7.height = 17;
-      r7.getCell(1).font = font({ color: { argb: 'FFCC0000' } });
+      r7.getCell(1).font = font({ color: { argb: 'FF444444' } });
 
       // Row 8: 空行
       ws.addRow([]).height = 8;
