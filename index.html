@@ -375,6 +375,9 @@
       r4b.height = 17;
       r4b.getCell(1).font = font({ color: { argb: 'FF444444' } });
 
+      // 空行（区切り）
+      ws.addRow([]).height = 6;
+
       // Row 5: 挨拶文
       const r5 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
       r5.height = 17;
