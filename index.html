@@ -330,80 +330,101 @@
 
       // 列幅設定
       ws.columns = [
-        { width: 42 }, // A: 商品名
+        { width: 40 }, // A: 商品名
         { width: 18 }, // B: 項目・選択肢
         { width: 6  }, // C: 個数
         { width: 14 }, // D: 氏名
         { width: 10 }, // E: 郵便番号
         { width: 7  }, // F: 都道府県
         { width: 14 }, // G: 都市区
-        { width: 32 }, // H: 町以降
+        { width: 30 }, // H: 町以降
         { width: 14 }, // I: 電話番号
         { width: 14 }, // J: お届け日指定
         { width: 16 }, // K: お届け時間帯
       ];
 
-      // 共通スタイル定義
-      const borderThin = { style: 'thin', color: { argb: 'FFB0BEC5' } };
-      const borderMed  = { style: 'medium', color: { argb: 'FF78909C' } };
-      const allThin  = { top: borderThin, bottom: borderThin, left: borderThin, right: borderThin };
-      const headBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F2937' } };
-      const evenBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+      const N = HEADERS => HEADERS.length; // 列数
+      const COLS = 11;
 
-      function plain(font = {}) {
-        return { name: 'Meiryo', size: 10, ...font };
+      // ── スタイル定義 ──────────────────────────────
+      const B = (s, argb = 'FF374151') => ({ style: s, color: { argb } });
+      const thin   = B('thin',   'FFB0C4D8');
+      const med    = B('medium', 'FF374151');
+      const thick  = B('thick',  'FF1F2937');
+      const allThin  = { top: thin, bottom: thin, left: thin, right: thin };
+
+      const fill = argb => ({ type: 'pattern', pattern: 'solid', fgColor: { argb } });
+      const font = (opts = {}) => ({ name: 'Meiryo', size: 10, ...opts });
+
+      // ── ヘッダーエリア（A1:K6）を白背景で統一 ────
+      // Row 1: タイトル行（背景: 濃紺）
+      const r1 = ws.addRow(['APJ 発注書', '', '', '', '', '', '', '', '', '', '']);
+      r1.height = 28;
+      for (let c = 1; c <= COLS; c++) {
+        const cell = r1.getCell(c);
+        cell.fill = fill('FF1F2937');
+        cell.border = allThin;
+        if (c === 1) {
+          cell.value = 'APJ 発注書';
+          cell.font = font({ bold: true, size: 15, color: { argb: 'FFFFFFFF' } });
+          cell.alignment = { vertical: 'middle' };
+        }
       }
 
-      // ── Row 1: 宛先 ──────────────────────────────
-      const r1 = ws.addRow(['アートプリントジャパン 御中']);
-      r1.height = 26;
-      r1.getCell(1).font = plain({ bold: true, size: 14 });
+      // Row 2: 空白（区切り）
+      const r2 = ws.addRow(Array(COLS).fill(''));
+      r2.height = 4;
 
-      // ── Row 2: 挨拶文 ─────────────────────────────
-      const r2 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
-      r2.height = 18;
-      r2.getCell(1).font = plain();
+      // Row 3: 宛先 ＋ 発注日
+      const r3 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '発注日', '', dateStr]);
+      r3.height = 22;
+      r3.getCell(1).font = font({ bold: true, size: 13 });
+      r3.getCell(1).alignment = { vertical: 'middle' };
+      r3.getCell(9).font = font({ bold: true, color: { argb: 'FF374151' } });
+      r3.getCell(9).alignment = { horizontal: 'right', vertical: 'middle' };
+      r3.getCell(11).font = font({ bold: true, size: 12, color: { argb: 'FFE85D26' } });
+      r3.getCell(11).alignment = { horizontal: 'center', vertical: 'middle' };
+      r3.getCell(11).border = { top: med, bottom: med, left: med, right: med };
+      r3.getCell(11).fill = fill('FFFFF3EE');
 
-      // ── Row 3: 発注者
-      const r3 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田']);
-      r3.height = 18;
-      r3.getCell(1).font = plain({ bold: true });
-
-      // ── Row 4: 住所
-      const r4 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地']);
+      // Row 4: 発注者・住所
+      const r4 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田', '', '', '', '', '', '', '', '〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地']);
       r4.height = 18;
-      r4.getCell(1).font = plain();
+      r4.getCell(1).font = font({ bold: true });
+      r4.getCell(9).font = font({ color: { argb: 'FF6B7280' } });
 
-      // ── Row 5: TEL/FAX
-      const r5 = ws.addRow([`TEL：052-807-0299　FAX：052-685-5116　　発注日：${dateStr}`]);
+      // Row 5: TEL/FAX
+      const r5 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。', '', '', '', '', '', '', '', 'TEL：052-807-0299　FAX：052-685-5116']);
       r5.height = 18;
-      r5.getCell(1).font = plain();
+      r5.getCell(1).font = font({ color: { argb: 'FF374151' } });
+      r5.getCell(9).font = font({ color: { argb: 'FF6B7280' } });
 
-      // ── Row 6: 空行
+      // Row 6: 注意事項（背景: 薄黄）
+      const r6 = ws.addRow(['【注意】●配送料は記載しないで下さい　●発送後に送り状番号をメールでご連絡下さい　●お届け日指定が空白の注文は日時指定しないで下さい']);
+      r6.height = 20;
+      for (let c = 1; c <= COLS; c++) {
+        const cell = r6.getCell(c);
+        cell.fill = fill('FFFFF8E1');
+        cell.border = { top: B('thin','FFFDE68A'), bottom: B('thin','FFFDE68A'), left: B('thin','FFFDE68A'), right: B('thin','FFFDE68A') };
+      }
+      r6.getCell(1).font = font({ bold: false, color: { argb: 'FF92400E' } });
+
+      // Row 7: 空行
       ws.addRow([]).height = 6;
 
-      // ── Row 7: 注意事項
-      const r7 = ws.addRow(['●入り日記には「配送料」は記載されない様、宜しくお願い致します。　●商品発送後に荷物の送り状番号をメールにてご連絡願います。　●お届け日指定が空白の注文は日時指定をしないで下さい。']);
-      r7.height = 18;
-      r7.getCell(1).font = plain({ color: { argb: 'FF7B341E' } });
-
-      // ── Row 8: 空行
-      ws.addRow([]).height = 6;
-
-      // ── Row 9: 列ヘッダー ─────────────────────────
+      // ── Row 8: 列ヘッダー ─────────────────────────
       const HEADERS = ['商品名', '項目・選択肢', '個数', '氏名', '郵便番号', '都道府県', '都市区', '町以降', '電話番号', 'お届け日指定', 'お届け時間帯'];
       const hRow = ws.addRow(HEADERS);
       hRow.height = 22;
-      for (let c = 1; c <= HEADERS.length; c++) {
+      for (let c = 1; c <= COLS; c++) {
         const cell = hRow.getCell(c);
-        cell.fill = headBg;
-        cell.font = plain({ bold: true, color: { argb: 'FFFFFFFF' } });
+        cell.fill = fill('FF374151');
+        cell.font = font({ bold: true, color: { argb: 'FFFFFFFF' } });
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
         cell.border = allThin;
       }
 
       // ── データ行 ──────────────────────────────────
-      const dataStartRow = 10;
       convertedData.forEach((r, idx) => {
         const dataRow = ws.addRow([
           r['商品名'], r['項目・選択肢'], r['個数'], r['氏名'],
@@ -411,11 +432,10 @@
           r['電話番号'], r['お届け日指定'], r['お届け時間帯']
         ]);
         dataRow.height = 18;
-        const bg = idx % 2 !== 0 ? evenBg : null;
-        for (let c = 1; c <= HEADERS.length; c++) {
+        for (let c = 1; c <= COLS; c++) {
           const cell = dataRow.getCell(c);
-          if (bg) cell.fill = bg;
-          cell.font = plain();
+          if (idx % 2 !== 0) cell.fill = fill('FFF8FAFC');
+          cell.font = font();
           cell.border = allThin;
           cell.alignment = { vertical: 'middle' };
         }
@@ -424,17 +444,17 @@
       });
 
       // ── 表全体の外枠を太線に ──────────────────────
-      const tableStart = 9; // ヘッダー行
-      const tableEnd   = 9 + convertedData.length;
-      for (let rn = tableStart; rn <= tableEnd; rn++) {
+      const tblStart = 8;
+      const tblEnd   = 8 + convertedData.length;
+      for (let rn = tblStart; rn <= tblEnd; rn++) {
         const row = ws.getRow(rn);
-        for (let c = 1; c <= HEADERS.length; c++) {
+        for (let c = 1; c <= COLS; c++) {
           const cell = row.getCell(c);
           const b = { ...cell.border };
-          if (rn === tableStart) b.top = { style: 'medium', color: { argb: 'FF374151' } };
-          if (rn === tableEnd)   b.bottom = { style: 'medium', color: { argb: 'FF374151' } };
-          if (c === 1)           b.left  = { style: 'medium', color: { argb: 'FF374151' } };
-          if (c === HEADERS.length) b.right = { style: 'medium', color: { argb: 'FF374151' } };
+          if (rn === tblStart) b.top    = thick;
+          if (rn === tblEnd)   b.bottom = thick;
+          if (c === 1)         b.left   = thick;
+          if (c === COLS)      b.right  = thick;
           cell.border = b;
         }
       }
