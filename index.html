@@ -350,12 +350,12 @@
       const btm = (s) => ({ bottom: bdr(s, 'FF000000') });
 
       // Row 1: 見出し「アートプリントジャパン 御中」（下線のみ）
-      const r1 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '', '', `発注日：${dateStr}`]);
+      const r1 = ws.addRow(['アートプリントジャパン 御中', `発注日：${dateStr}`]);
       r1.height = 28;
       r1.getCell(1).font = font({ bold: true, size: 14 });
       r1.getCell(1).border = { bottom: bdr('medium') };
-      r1.getCell(11).font = font({ size: 10 });
-      r1.getCell(11).alignment = { horizontal: 'right', vertical: 'bottom' };
+      r1.getCell(2).font = font({ size: 10 });
+      r1.getCell(2).alignment = { horizontal: 'left', vertical: 'bottom' };
 
       // Row 2: 空行
       ws.addRow([]).height = 8;
