@@ -343,88 +343,64 @@
         { width: 16 }, // K: お届け時間帯
       ];
 
-      const N = HEADERS => HEADERS.length; // 列数
       const COLS = 11;
 
-      // ── スタイル定義 ──────────────────────────────
-      const B = (s, argb = 'FF374151') => ({ style: s, color: { argb } });
-      const thin   = B('thin',   'FFB0C4D8');
-      const med    = B('medium', 'FF374151');
-      const thick  = B('thick',  'FF1F2937');
-      const allThin  = { top: thin, bottom: thin, left: thin, right: thin };
-
-      const fill = argb => ({ type: 'pattern', pattern: 'solid', fgColor: { argb } });
       const font = (opts = {}) => ({ name: 'Meiryo', size: 10, ...opts });
+      const bdr = (s, argb = 'FF000000') => ({ style: s, color: { argb } });
+      const btm = (s) => ({ bottom: bdr(s, 'FF000000') });
 
-      // ── ヘッダーエリア（A1:K6）を白背景で統一 ────
-      // Row 1: タイトル行（背景: 濃紺）
-      const r1 = ws.addRow(['APJ 発注書', '', '', '', '', '', '', '', '', '', '']);
-      r1.height = 28;
-      for (let c = 1; c <= COLS; c++) {
-        const cell = r1.getCell(c);
-        cell.fill = fill('FF1F2937');
-        cell.border = allThin;
-        if (c === 1) {
-          cell.value = 'APJ 発注書';
-          cell.font = font({ bold: true, size: 15, color: { argb: 'FFFFFFFF' } });
-          cell.alignment = { vertical: 'middle' };
-        }
-      }
+      // Row 1: タイトル（下線のみ）
+      const r1 = ws.addRow(['APJ 発注書']);
+      r1.height = 30;
+      r1.getCell(1).font = font({ bold: true, size: 16 });
+      r1.getCell(1).border = { bottom: bdr('medium') };
 
-      // Row 2: 空白（区切り）
-      const r2 = ws.addRow(Array(COLS).fill(''));
-      r2.height = 4;
+      // Row 2: 空行
+      ws.addRow([]).height = 10;
 
-      // Row 3: 宛先 ＋ 発注日
-      const r3 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '発注日', '', dateStr]);
-      r3.height = 22;
-      r3.getCell(1).font = font({ bold: true, size: 13 });
-      r3.getCell(1).alignment = { vertical: 'middle' };
-      r3.getCell(9).font = font({ bold: true, color: { argb: 'FF374151' } });
-      r3.getCell(9).alignment = { horizontal: 'right', vertical: 'middle' };
-      r3.getCell(11).font = font({ bold: true, size: 12, color: { argb: 'FFE85D26' } });
-      r3.getCell(11).alignment = { horizontal: 'center', vertical: 'middle' };
-      r3.getCell(11).border = { top: med, bottom: med, left: med, right: med };
-      r3.getCell(11).fill = fill('FFFFF3EE');
+      // Row 3: 宛先（左）＋ 発注日（右、普通テキスト）
+      const r3 = ws.addRow(['アートプリントジャパン 御中', '', '', '', '', '', '', '', '', '', `発注日：${dateStr}`]);
+      r3.height = 20;
+      r3.getCell(1).font = font({ bold: true, size: 12 });
+      r3.getCell(11).font = font({ size: 10 });
+      r3.getCell(11).alignment = { horizontal: 'right' };
 
-      // Row 4: 発注者・住所
-      const r4 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田', '', '', '', '', '', '', '', '〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地']);
-      r4.height = 18;
+      // Row 4: 発注者
+      const r4 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田']);
+      r4.height = 17;
       r4.getCell(1).font = font({ bold: true });
-      r4.getCell(9).font = font({ color: { argb: 'FF6B7280' } });
 
-      // Row 5: TEL/FAX
-      const r5 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。', '', '', '', '', '', '', '', 'TEL：052-807-0299　FAX：052-685-5116']);
-      r5.height = 18;
-      r5.getCell(1).font = font({ color: { argb: 'FF374151' } });
-      r5.getCell(9).font = font({ color: { argb: 'FF6B7280' } });
+      // Row 5: 住所・TEL
+      const r5 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地　TEL：052-807-0299　FAX：052-685-5116']);
+      r5.height = 17;
+      r5.getCell(1).font = font({ color: { argb: 'FF444444' } });
 
-      // Row 6: 注意事項（背景: 薄黄）
-      const r6 = ws.addRow(['【注意】●配送料は記載しないで下さい　●発送後に送り状番号をメールでご連絡下さい　●お届け日指定が空白の注文は日時指定しないで下さい']);
-      r6.height = 20;
-      for (let c = 1; c <= COLS; c++) {
-        const cell = r6.getCell(c);
-        cell.fill = fill('FFFFF8E1');
-        cell.border = { top: B('thin','FFFDE68A'), bottom: B('thin','FFFDE68A'), left: B('thin','FFFDE68A'), right: B('thin','FFFDE68A') };
-      }
-      r6.getCell(1).font = font({ bold: false, color: { argb: 'FF92400E' } });
+      // Row 6: 挨拶文
+      const r6 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
+      r6.height = 17;
+      r6.getCell(1).font = font();
 
-      // Row 7: 空行
-      ws.addRow([]).height = 6;
+      // Row 7: 注意事項（赤字、背景なし）
+      const r7 = ws.addRow(['【注意】●配送料は記載しないで下さい　●発送後に送り状番号をメールでご連絡下さい　●お届け日指定が空白の注文は日時指定しないで下さい']);
+      r7.height = 17;
+      r7.getCell(1).font = font({ color: { argb: 'FFCC0000' } });
 
-      // ── Row 8: 列ヘッダー ─────────────────────────
+      // Row 8: 空行
+      ws.addRow([]).height = 8;
+
+      // Row 9: 列ヘッダー（薄グレー背景、下線のみ）
       const HEADERS = ['商品名', '項目・選択肢', '個数', '氏名', '郵便番号', '都道府県', '都市区', '町以降', '電話番号', 'お届け日指定', 'お届け時間帯'];
       const hRow = ws.addRow(HEADERS);
-      hRow.height = 22;
+      hRow.height = 20;
       for (let c = 1; c <= COLS; c++) {
         const cell = hRow.getCell(c);
-        cell.fill = fill('FF374151');
-        cell.font = font({ bold: true, color: { argb: 'FFFFFFFF' } });
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+        cell.font = font({ bold: true });
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-        cell.border = allThin;
+        cell.border = { bottom: bdr('medium') };
       }
 
-      // ── データ行 ──────────────────────────────────
+      // データ行（下線のみ）
       convertedData.forEach((r, idx) => {
         const dataRow = ws.addRow([
           r['商品名'], r['項目・選択肢'], r['個数'], r['氏名'],
@@ -432,32 +408,16 @@
           r['電話番号'], r['お届け日指定'], r['お届け時間帯']
         ]);
         dataRow.height = 18;
+        const isLast = idx === convertedData.length - 1;
         for (let c = 1; c <= COLS; c++) {
           const cell = dataRow.getCell(c);
-          if (idx % 2 !== 0) cell.fill = fill('FFF8FAFC');
           cell.font = font();
-          cell.border = allThin;
+          cell.border = { bottom: bdr(isLast ? 'medium' : 'thin', isLast ? 'FF000000' : 'FFCCCCCC') };
           cell.alignment = { vertical: 'middle' };
         }
         dataRow.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
         dataRow.getCell(1).alignment = { vertical: 'middle', wrapText: true };
       });
-
-      // ── 表全体の外枠を太線に ──────────────────────
-      const tblStart = 8;
-      const tblEnd   = 8 + convertedData.length;
-      for (let rn = tblStart; rn <= tblEnd; rn++) {
-        const row = ws.getRow(rn);
-        for (let c = 1; c <= COLS; c++) {
-          const cell = row.getCell(c);
-          const b = { ...cell.border };
-          if (rn === tblStart) b.top    = thick;
-          if (rn === tblEnd)   b.bottom = thick;
-          if (c === 1)         b.left   = thick;
-          if (c === COLS)      b.right  = thick;
-          cell.border = b;
-        }
-      }
 
       // ── 出力 ──────────────────────────────────────
       const fname = `APJ発注書_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.xlsx`;
