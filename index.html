@@ -325,6 +325,9 @@
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('APJ発注書');
 
+      // グリッドライン非表示
+      ws.views = [{ showGridLines: false }];
+
       // 列幅設定
       ws.columns = [
         { width: 42 }, // A: 商品名
@@ -344,87 +347,63 @@
       const borderThin = { style: 'thin', color: { argb: 'FFB0BEC5' } };
       const borderMed  = { style: 'medium', color: { argb: 'FF78909C' } };
       const allThin  = { top: borderThin, bottom: borderThin, left: borderThin, right: borderThin };
-      const allMed   = { top: borderMed,  bottom: borderMed,  left: borderMed,  right: borderMed  };
-      const noteBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8E1' } };
       const headBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F2937' } };
-      const infoBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
-      const evenBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
-      const whiteBg  = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-      const accentBg = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3EE' } };
+      const evenBg   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+
+      function plain(font = {}) {
+        return { name: 'Meiryo', size: 10, ...font };
+      }
 
       // ── Row 1: 宛先 ──────────────────────────────
       const r1 = ws.addRow(['アートプリントジャパン 御中']);
       r1.height = 26;
-      const c1a = r1.getCell(1);
-      c1a.font = { bold: true, size: 14, name: 'Meiryo' };
-      c1a.fill = whiteBg;
+      r1.getCell(1).font = plain({ bold: true, size: 14 });
 
       // ── Row 2: 挨拶文 ─────────────────────────────
-      const r2 = ws.addRow(['', '', '', '', '', '', '', 'お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
+      const r2 = ws.addRow(['お手数をおかけ致しますが、下記の直送手配を宜しくお願い申し上げます。']);
       r2.height = 18;
-      r2.getCell(8).font = { size: 10, name: 'Meiryo' };
-      r2.getCell(8).fill = whiteBg;
+      r2.getCell(1).font = plain();
 
-      // ── Row 3: 発注者 + 注意①
-      const r3 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田', '', '', '', '', '', '', '● 入り日記には「配送料」は記載されない様、宜しくお願い致します。']);
-      r3.height = 20;
-      r3.getCell(1).font = { bold: true, size: 10, name: 'Meiryo' };
-      r3.getCell(1).fill = infoBg;
-      const n3 = r3.getCell(8);
-      n3.font = { size: 10, name: 'Meiryo', color: { argb: 'FF7B341E' } };
-      n3.fill = noteBg;
-      n3.border = { left: { style: 'medium', color: { argb: 'FFE85D26' } } };
+      // ── Row 3: 発注者
+      const r3 = ws.addRow(['発注者：有限会社 EL COMMUN　担当：真田']);
+      r3.height = 18;
+      r3.getCell(1).font = plain({ bold: true });
 
-      // ── Row 4: 住所 + 発注日ラベル + 注意②
-      const r4 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地', '', '', '発注日', '', '', '', '● 商品発送後に荷物の送り状番号をメールにてご連絡願います。']);
-      r4.height = 20;
-      r4.getCell(1).font = { size: 10, name: 'Meiryo' };
-      r4.getCell(1).fill = infoBg;
-      const d4 = r4.getCell(4);
-      d4.font = { bold: true, size: 10, name: 'Meiryo', color: { argb: 'FF374151' } };
-      d4.fill = infoBg;
-      d4.alignment = { horizontal: 'right' };
-      const n4 = r4.getCell(8);
-      n4.font = { size: 10, name: 'Meiryo', color: { argb: 'FF7B341E' } };
-      n4.fill = noteBg;
-      n4.border = { left: { style: 'medium', color: { argb: 'FFE85D26' } } };
+      // ── Row 4: 住所
+      const r4 = ws.addRow(['〒468-0007 愛知県名古屋市天白区植田本町2丁目1006番地']);
+      r4.height = 18;
+      r4.getCell(1).font = plain();
 
-      // ── Row 5: TEL/FAX + 発注日 + 注意③
-      const r5 = ws.addRow(['TEL：052-807-0299　FAX：052-685-5116', '', '', dateStr, '', '', '', '● お届け日指定が空白の注文は日時指定をしないで下さい。']);
-      r5.height = 22;
-      r5.getCell(1).font = { size: 10, name: 'Meiryo' };
-      r5.getCell(1).fill = infoBg;
-      const d5 = r5.getCell(4);
-      d5.font = { bold: true, size: 13, name: 'Meiryo', color: { argb: 'FFE85D26' } };
-      d5.fill = accentBg;
-      d5.alignment = { horizontal: 'center', vertical: 'middle' };
-      d5.border = allMed;
-      const n5 = r5.getCell(8);
-      n5.font = { size: 10, name: 'Meiryo', color: { argb: 'FF7B341E' } };
-      n5.fill = noteBg;
-      n5.border = { left: { style: 'medium', color: { argb: 'FFE85D26' } } };
+      // ── Row 5: TEL/FAX
+      const r5 = ws.addRow([`TEL：052-807-0299　FAX：052-685-5116　　発注日：${dateStr}`]);
+      r5.height = 18;
+      r5.getCell(1).font = plain();
 
-      // ── Row 6: 空行 ───────────────────────────────
+      // ── Row 6: 空行
       ws.addRow([]).height = 6;
 
-      // ── Row 7: 列ヘッダー ─────────────────────────
+      // ── Row 7: 注意事項
+      const r7 = ws.addRow(['●入り日記には「配送料」は記載されない様、宜しくお願い致します。　●商品発送後に荷物の送り状番号をメールにてご連絡願います。　●お届け日指定が空白の注文は日時指定をしないで下さい。']);
+      r7.height = 18;
+      r7.getCell(1).font = plain({ color: { argb: 'FF7B341E' } });
+
+      // ── Row 8: 空行
+      ws.addRow([]).height = 6;
+
+      // ── Row 9: 列ヘッダー ─────────────────────────
       const HEADERS = ['商品名', '項目・選択肢', '個数', '氏名', '郵便番号', '都道府県', '都市区', '町以降', '電話番号', 'お届け日指定', 'お届け時間帯'];
       const hRow = ws.addRow(HEADERS);
       hRow.height = 22;
-      hRow.eachCell((cell, col) => {
-        if (col > HEADERS.length) return;
+      for (let c = 1; c <= HEADERS.length; c++) {
+        const cell = hRow.getCell(c);
         cell.fill = headBg;
-        cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10, name: 'Meiryo' };
+        cell.font = plain({ bold: true, color: { argb: 'FFFFFFFF' } });
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-        cell.border = {
-          top:    { style: 'medium', color: { argb: 'FF111827' } },
-          bottom: { style: 'medium', color: { argb: 'FF111827' } },
-          left:   borderThin,
-          right:  borderThin,
-        };
-      });
+        cell.border = allThin;
+      }
 
       // ── データ行 ──────────────────────────────────
+      const dataStartRow = 10;
       convertedData.forEach((r, idx) => {
         const dataRow = ws.addRow([
           r['商品名'], r['項目・選択肢'], r['個数'], r['氏名'],
@@ -432,38 +411,32 @@
           r['電話番号'], r['お届け日指定'], r['お届け時間帯']
         ]);
         dataRow.height = 18;
-        const bg = idx % 2 === 0 ? whiteBg : evenBg;
-        dataRow.eachCell({ includeEmpty: true }, (cell, col) => {
-          if (col > HEADERS.length) return;
-          cell.fill = bg;
-          cell.font = { size: 10, name: 'Meiryo' };
+        const bg = idx % 2 !== 0 ? evenBg : null;
+        for (let c = 1; c <= HEADERS.length; c++) {
+          const cell = dataRow.getCell(c);
+          if (bg) cell.fill = bg;
+          cell.font = plain();
           cell.border = allThin;
-          cell.alignment = { vertical: 'middle', wrapText: false };
-        });
-        // 個数列は中央揃え
+          cell.alignment = { vertical: 'middle' };
+        }
         dataRow.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
-        // 商品名は折り返し
         dataRow.getCell(1).alignment = { vertical: 'middle', wrapText: true };
       });
 
-      // ── 外枠を太線に ──────────────────────────────
-      const dataStart = 8; // 列ヘッダー行番号
-      const dataEnd   = 7 + convertedData.length;
-      [dataStart, dataEnd].forEach(rowNum => {
-        const row = ws.getRow(rowNum);
+      // ── 表全体の外枠を太線に ──────────────────────
+      const tableStart = 9; // ヘッダー行
+      const tableEnd   = 9 + convertedData.length;
+      for (let rn = tableStart; rn <= tableEnd; rn++) {
+        const row = ws.getRow(rn);
         for (let c = 1; c <= HEADERS.length; c++) {
           const cell = row.getCell(c);
-          if (rowNum === dataStart) {
-            cell.border = { ...cell.border, top: borderMed };
-          } else {
-            cell.border = { ...cell.border, bottom: borderMed };
-          }
+          const b = { ...cell.border };
+          if (rn === tableStart) b.top = { style: 'medium', color: { argb: 'FF374151' } };
+          if (rn === tableEnd)   b.bottom = { style: 'medium', color: { argb: 'FF374151' } };
+          if (c === 1)           b.left  = { style: 'medium', color: { argb: 'FF374151' } };
+          if (c === HEADERS.length) b.right = { style: 'medium', color: { argb: 'FF374151' } };
+          cell.border = b;
         }
-      });
-      for (let rn = dataStart; rn <= dataEnd; rn++) {
-        const row = ws.getRow(rn);
-        row.getCell(1).border = { ...row.getCell(1).border, left: borderMed };
-        row.getCell(HEADERS.length).border = { ...row.getCell(HEADERS.length).border, right: borderMed };
       }
 
       // ── 出力 ──────────────────────────────────────
